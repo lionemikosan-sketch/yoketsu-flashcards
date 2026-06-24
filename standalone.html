@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#08090c" />
+<title>要穴 Flash ── 経絡経穴 試験対策</title>
+<style>
+  :root{
+    --bg:#070809;
+    --bg-2:#0d0f13;
+    --ink:#e8eaef;
+    --ink-dim:#9aa0ab;
+    --ink-faint:#5b616d;
+    --line:rgba(255,255,255,.08);
+    --line-soft:rgba(255,255,255,.05);
+    --card:#f6f5f1;
+    --card-2:#efeee8;
+    --card-ink:#16181c;
+    --card-ink-dim:#5a5f66;
+    --gold:#e9c46a;
+    --accent:#7dd3c0;
+    /* meridian colors */
+    --m-PC:#fb7185; /* 心包 */
+    --m-TE:#f7b955; /* 三焦 */
+    --m-GB:#34d399; /* 胆 */
+    --m-LR:#a3e635; /* 肝 */
+    /* status */
+    --s-new:#6b7280;
+    --s-forgot:#fb7185;
+    --s-good:#56b8f0;
+    --s-perfect:#e9c46a;
+    --radius:26px;
+    --maxw:560px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;height:100%}
+  body{
+    background:
+      radial-gradient(1100px 700px at 50% -10%, rgba(125,211,192,.10), transparent 60%),
+      radial-gradient(900px 600px at 85% 110%, rgba(233,196,106,.07), transparent 55%),
+      radial-gradient(800px 600px at 10% 100%, rgba(251,113,133,.06), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP","BIZ UDPGothic",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overscroll-behavior-y:none;
+  }
+  .mincho{font-family:"Hiragino Mincho ProN","YuMincho","Yu Mincho","Noto Serif JP",serif}
+  #root{min-height:100%;display:flex;flex-direction:column}
+  .app{width:100%;max-width:var(--maxw);margin:0 auto;padding:0 18px;flex:1;display:flex;flex-direction:column}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  .fadein{animation:fadein .45s cubic-bezier(.2,.8,.2,1) both}
+  @keyframes fadein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  /* ---------- Header ---------- */
+  .topbar{display:flex;align-items:center;gap:12px;padding:22px 2px 14px}
+  .brand{display:flex;align-items:center;gap:11px;cursor:pointer}
+  .logo{width:38px;height:38px;flex:none}
+  .brand h1{font-size:20px;margin:0;letter-spacing:.06em;font-weight:700}
+  .brand .sub{font-size:11px;color:var(--ink-dim);letter-spacing:.18em;margin-top:2px}
+  .spacer{flex:1}
+  .ghost-btn{padding:9px 14px;border-radius:999px;border:1px solid var(--line);color:var(--ink-dim);font-size:13px;font-weight:600;display:flex;gap:7px;align-items:center;transition:.18s}
+  .ghost-btn:hover{color:var(--ink);border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.03)}
+
+  /* ---------- Section / labels ---------- */
+  .sec{margin-top:24px}
+  .sec-label{font-size:11px;letter-spacing:.22em;color:var(--ink-faint);font-weight:700;margin:0 0 11px 2px;text-transform:uppercase}
+
+  /* ---------- Segmented ---------- */
+  .seg{display:flex;background:var(--bg-2);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px}
+  .seg button{flex:1;padding:12px 8px;border-radius:10px;font-size:13.5px;font-weight:600;color:var(--ink-dim);transition:.18s;line-height:1.35}
+  .seg button .s2{display:block;font-size:11px;font-weight:500;color:var(--ink-faint);margin-top:2px}
+  .seg button.on{background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04));color:var(--ink);box-shadow:0 1px 0 rgba(255,255,255,.06) inset}
+  .seg button.on .s2{color:var(--ink-dim)}
+
+  /* ---------- Meridian chips ---------- */
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .chip{display:flex;align-items:center;gap:11px;padding:13px 14px;border-radius:15px;border:1px solid var(--line);background:var(--bg-2);transition:.18s;text-align:left}
+  .chip:hover{border-color:rgba(255,255,255,.2)}
+  .chip .dot{width:11px;height:11px;border-radius:50%;flex:none;box-shadow:0 0 0 0 rgba(0,0,0,0)}
+  .chip .nm{font-size:15px;font-weight:700;line-height:1.1}
+  .chip .meta{font-size:11px;color:var(--ink-faint);margin-top:2px}
+  .chip.on{background:rgba(255,255,255,.05);border-color:var(--mc)}
+  .chip.on .dot{box-shadow:0 0 12px 1px var(--mc)}
+  .chip .check{margin-left:auto;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;transition:.18s}
+  .chip.on .check{background:var(--mc);border-color:var(--mc)}
+  .chip .check svg{opacity:0;transition:.18s;width:11px;height:11px}
+  .chip.on .check svg{opacity:1}
+  .chip-all{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;padding:11px 15px;border-radius:13px;border:1px dashed var(--line);color:var(--ink-dim);font-size:13px;font-weight:600}
+  .chip-all:hover{color:var(--ink);border-color:rgba(255,255,255,.25)}
+
+  /* ---------- Primary CTA ---------- */
+  .cta{width:100%;margin-top:8px;padding:18px;border-radius:18px;font-size:16.5px;font-weight:800;letter-spacing:.04em;
+    color:#0a0b0d;background:linear-gradient(180deg,#fbf7ec,#e9c46a 120%);
+    box-shadow:0 10px 34px -10px rgba(233,196,106,.55),0 1px 0 rgba(255,255,255,.6) inset;transition:.18s;display:flex;align-items:center;justify-content:center;gap:10px}
+  .cta:hover{transform:translateY(-2px);box-shadow:0 16px 40px -10px rgba(233,196,106,.65)}
+  .cta:active{transform:translateY(0)}
+  .cta:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+
+  .review-btn{width:100%;margin-top:11px;padding:15px 18px;border-radius:16px;display:flex;align-items:center;gap:13px;
+    background:linear-gradient(180deg,rgba(251,113,133,.13),rgba(251,113,133,.05));border:1px solid rgba(251,113,133,.32);transition:.18s}
+  .review-btn:hover{border-color:rgba(251,113,133,.55);transform:translateY(-1px)}
+  .review-btn:disabled{opacity:.42;cursor:not-allowed;transform:none}
+  .review-btn .ico{width:38px;height:38px;border-radius:11px;background:rgba(251,113,133,.16);display:flex;align-items:center;justify-content:center;flex:none}
+  .review-btn .t1{font-size:14.5px;font-weight:700}
+  .review-btn .t2{font-size:11.5px;color:var(--ink-dim);margin-top:1px}
+  .review-btn .num{margin-left:auto;font-size:22px;font-weight:800;color:var(--s-forgot);font-variant-numeric:tabular-nums}
+
+  /* ---------- Summary card ---------- */
+  .summary{margin-top:14px;padding:18px;border-radius:20px;background:linear-gradient(180deg,var(--bg-2),rgba(13,15,19,.4));border:1px solid var(--line);display:flex;gap:18px;align-items:center}
+  .ring-wrap{position:relative;flex:none}
+  .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .ring-center b{font-size:23px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+  .ring-center span{font-size:9.5px;color:var(--ink-faint);letter-spacing:.14em;margin-top:3px}
+  .summary .stats{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:9px 14px}
+  .stat{display:flex;align-items:center;gap:8px;font-size:12.5px}
+  .stat .sw{width:9px;height:9px;border-radius:3px;flex:none}
+  .stat b{font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink)}
+  .stat span{color:var(--ink-dim)}
+
+  .mini-row{display:flex;gap:10px;margin-top:11px}
+  .mini{flex:1;padding:13px;border-radius:15px;background:var(--bg-2);border:1px solid var(--line);text-align:center}
+  .mini b{display:block;font-size:21px;font-weight:800;font-variant-numeric:tabular-nums}
+  .mini span{font-size:11px;color:var(--ink-dim)}
+  .mini .fire{color:var(--gold)}
+
+  /* ---------- Study screen ---------- */
+  .study-top{display:flex;align-items:center;gap:14px;padding:18px 2px 6px}
+  .pbar{flex:1;height:6px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+  .pbar > i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--gold));transition:width .35s cubic-bezier(.2,.8,.2,1)}
+  .counter{font-size:13px;color:var(--ink-dim);font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+  .x-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);color:var(--ink-dim);display:flex;align-items:center;justify-content:center;transition:.18s}
+  .x-btn:hover{color:var(--ink);border-color:rgba(255,255,255,.25)}
+
+  .stage{position:relative;height:clamp(360px,54vh,500px);margin:14px 0 4px;perspective:1900px}
+  .flip{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .62s cubic-bezier(.3,.85,.25,1);cursor:pointer}
+  .flip.flipped{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    border-radius:var(--radius);padding:26px;display:flex;flex-direction:column;overflow:hidden;
+    background:linear-gradient(165deg,var(--card),var(--card-2));
+    box-shadow:0 30px 60px -22px rgba(0,0,0,.7),0 2px 0 rgba(255,255,255,.5) inset,0 0 0 1px rgba(0,0,0,.04);}
+  .face.back{transform:rotateY(180deg)}
+  .face::before{content:"";position:absolute;inset:0;border-radius:var(--radius);border:1px solid rgba(255,255,255,.6);pointer-events:none;mask:linear-gradient(#000,transparent 60%)}
+  .face-top{display:flex;align-items:center;gap:8px;position:relative;z-index:2}
+  .m-pill{font-size:12px;font-weight:800;padding:6px 12px;border-radius:999px;color:#fff;letter-spacing:.04em}
+  .limb-pill{font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;color:var(--card-ink-dim);background:rgba(0,0,0,.05);border:1px solid rgba(0,0,0,.06)}
+  .code-pill{margin-left:auto;font-size:12.5px;font-weight:800;letter-spacing:.06em;color:var(--card-ink-dim);font-variant-numeric:tabular-nums}
+  .face-mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;z-index:2}
+  .watermark{position:absolute;font-size:230px;line-height:1;color:rgba(20,22,26,.035);z-index:0;user-select:none;pointer-events:none;font-weight:600}
+  .pt-name{font-size:clamp(58px,17vw,86px);font-weight:600;color:var(--card-ink);letter-spacing:.04em;line-height:1.05}
+  .pt-read{font-size:16px;color:var(--card-ink-dim);margin-top:14px;letter-spacing:.22em}
+  .face-foot{display:flex;align-items:center;justify-content:center;gap:8px;color:#a8a59b;font-size:12.5px;font-weight:600;position:relative;z-index:2}
+  .face-foot svg{opacity:.7}
+
+  /* attribute tags (back, mode A) */
+  .attr-list{display:flex;flex-direction:column;gap:11px;width:100%;max-width:330px}
+  .attr{display:flex;align-items:center;gap:13px;padding:15px 17px;border-radius:15px;background:#fff;border:1px solid rgba(0,0,0,.06);border-left:5px solid var(--ac);box-shadow:0 6px 16px -10px rgba(0,0,0,.3)}
+  .attr .ad{width:11px;height:11px;border-radius:50%;background:var(--ac);flex:none;box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 20%,transparent)}
+  .attr .al{font-size:20px;font-weight:800;color:var(--card-ink);letter-spacing:.03em}
+  .attr .acat{margin-left:auto;font-size:11px;font-weight:700;color:#9b988e;letter-spacing:.05em}
+  .back-name{font-size:15px;color:var(--card-ink-dim);font-weight:700;margin-bottom:4px;letter-spacing:.05em}
+
+  /* mode B faces */
+  .cat-name{font-size:clamp(46px,13vw,68px);font-weight:600;color:var(--card-ink);letter-spacing:.05em}
+  .cat-hint{font-size:14px;color:var(--card-ink-dim);margin-top:16px;letter-spacing:.05em}
+  .cat-count{margin-top:10px;font-size:12px;font-weight:700;color:#9b988e;padding:5px 12px;border-radius:99px;background:rgba(0,0,0,.04)}
+  .pts-grid{display:flex;flex-direction:column;gap:9px;width:100%;max-width:340px;overflow-y:auto;max-height:100%;padding:2px}
+  .ptrow{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:13px;background:#fff;border:1px solid rgba(0,0,0,.06)}
+  .ptrow .pd{width:9px;height:9px;border-radius:50%;flex:none}
+  .ptrow .pn{font-size:19px;font-weight:800;color:var(--card-ink)}
+  .ptrow .pr{font-size:11px;color:#9b988e;margin-left:2px}
+  .ptrow .pc{margin-left:auto;font-size:11.5px;font-weight:800;color:#9b988e;font-variant-numeric:tabular-nums}
+  .ptrow .psub{font-size:11px;font-weight:700;color:#b6b3a8}
+
+  /* ---------- Controls ---------- */
+  .nav-row{display:flex;align-items:center;gap:10px;margin-top:16px}
+  .nav-btn{width:52px;height:52px;border-radius:15px;border:1px solid var(--line);background:var(--bg-2);color:var(--ink-dim);display:flex;align-items:center;justify-content:center;transition:.16s;flex:none}
+  .nav-btn:hover:not(:disabled){color:var(--ink);border-color:rgba(255,255,255,.25);transform:translateY(-1px)}
+  .nav-btn:disabled{opacity:.3;cursor:not-allowed}
+  .flip-cue{flex:1;height:52px;border-radius:15px;border:1px solid var(--line);background:var(--bg-2);color:var(--ink-dim);font-size:13.5px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;transition:.16s}
+  .flip-cue:hover{color:var(--ink);border-color:rgba(255,255,255,.22)}
+
+  .status-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:11px}
+  .sbtn{padding:15px 8px;border-radius:15px;border:1px solid var(--bc);background:var(--bgc);color:var(--cc);font-size:14.5px;font-weight:800;transition:.16s;display:flex;flex-direction:column;align-items:center;gap:5px;letter-spacing:.04em}
+  .sbtn .k{font-size:10px;font-weight:600;opacity:.6}
+  .sbtn:hover{transform:translateY(-2px);filter:brightness(1.12)}
+  .sbtn:active{transform:translateY(0) scale(.97)}
+  .sbtn.cur{box-shadow:0 0 0 2px var(--cc) inset}
+  .status-note{text-align:center;font-size:11px;color:var(--ink-faint);margin-top:9px;letter-spacing:.04em}
+
+  /* ---------- Completion overlay ---------- */
+  .overlay{position:fixed;inset:0;z-index:50;background:rgba(5,6,8,.74);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:24px;animation:fadein .3s both}
+  .done{width:100%;max-width:380px;background:linear-gradient(180deg,var(--bg-2),#0a0b0e);border:1px solid var(--line);border-radius:24px;padding:30px 24px;text-align:center;position:relative;overflow:hidden}
+  .done .seal{width:78px;height:78px;margin:0 auto 16px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(circle at 35% 30%,#fbf3da,#e9c46a);box-shadow:0 10px 30px -8px rgba(233,196,106,.55)}
+  .done h2{font-size:22px;margin:0 0 6px;letter-spacing:.05em}
+  .done p{font-size:13px;color:var(--ink-dim);margin:0 0 20px}
+  .done-stats{display:flex;justify-content:center;gap:8px;margin-bottom:22px}
+  .ds{flex:1;padding:13px 6px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
+  .ds b{display:block;font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
+  .ds span{font-size:10.5px;color:var(--ink-dim)}
+  .done .cta{margin-top:0}
+  .done .ghost-btn{width:100%;justify-content:center;margin-top:10px;padding:13px}
+  .confetti{position:absolute;top:-12px;width:9px;height:14px;border-radius:2px;animation:fall linear forwards;z-index:1}
+  @keyframes fall{to{transform:translateY(560px) rotate(540deg);opacity:0}}
+
+  /* ---------- Progress screen ---------- */
+  .prog-hero{display:flex;gap:20px;align-items:center;padding:22px;border-radius:22px;background:linear-gradient(180deg,var(--bg-2),rgba(13,15,19,.3));border:1px solid var(--line);margin-top:6px}
+  .prog-hero .stats{flex:1;display:flex;flex-direction:column;gap:11px}
+  .legend{display:flex;align-items:center;gap:10px;font-size:13.5px}
+  .legend .sw{width:11px;height:11px;border-radius:4px}
+  .legend b{font-variant-numeric:tabular-nums;font-weight:800;margin-left:auto}
+  .legend span{color:var(--ink-dim)}
+  .mrow{margin-top:13px;padding:15px 16px;border-radius:16px;background:var(--bg-2);border:1px solid var(--line)}
+  .mrow .h{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+  .mrow .h .dot{width:10px;height:10px;border-radius:50%}
+  .mrow .h .nm{font-size:14px;font-weight:700}
+  .mrow .h .pct{margin-left:auto;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink-dim)}
+  .sbar{height:9px;border-radius:99px;overflow:hidden;display:flex;background:rgba(255,255,255,.06)}
+  .sbar > i{height:100%}
+  .weak-row{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line-soft)}
+  .weak-row .rk{width:22px;font-size:13px;font-weight:800;color:var(--ink-faint);text-align:center}
+  .weak-row .wn{font-size:15px;font-weight:700}
+  .weak-row .wc{font-size:11px;color:var(--ink-dim);margin-left:7px}
+  .weak-row .wb{margin-left:auto;font-size:12px;font-weight:700;color:var(--s-forgot)}
+  .danger-btn{width:100%;margin-top:18px;padding:14px;border-radius:14px;border:1px solid rgba(251,113,133,.25);color:var(--s-forgot);font-size:13.5px;font-weight:700;transition:.18s}
+  .danger-btn:hover{background:rgba(251,113,133,.08);border-color:rgba(251,113,133,.45)}
+
+  .empty{text-align:center;padding:50px 20px;color:var(--ink-dim)}
+  .empty .e-ico{width:60px;height:60px;margin:0 auto 16px;border-radius:50%;background:var(--bg-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+  .empty h3{color:var(--ink);font-size:17px;margin:0 0 8px}
+  .empty p{font-size:13px;margin:0 0 18px}
+
+  .foot{text-align:center;color:var(--ink-faint);font-size:11px;padding:26px 0 22px;letter-spacing:.05em}
+  .err{padding:40px;text-align:center;color:var(--ink-dim);font-size:14px;line-height:1.8}
+  @media (max-width:380px){ .pt-name{font-size:64px} .summary{flex-direction:column} }
+  @media (prefers-reduced-motion:reduce){ *{animation-duration:.01ms !important;transition-duration:.08s !important} }
+</style>
+</head>
+<body>
+<div id="root"><div class="err">読み込み中…<br><small>（初回はインターネット接続が必要です）</small></div></div>
+
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useMemo, useRef, useCallback } = React;
+
+/* ============================================================
+   1. DATA  ── ここを編集すれば問題を追加・修正できます
+   ============================================================ */
+const MERIDIANS = {
+  PC: { name:"手の厥陰心包経", short:"心包経", limb:"上肢", color:"var(--m-PC)", hex:"#fb7185" },
+  TE: { name:"手の少陽三焦経", short:"三焦経", limb:"上肢", color:"var(--m-TE)", hex:"#f7b955" },
+  GB: { name:"足の少陽胆経",   short:"胆経",   limb:"下肢", color:"var(--m-GB)", hex:"#34d399" },
+  LR: { name:"足の厥陰肝経",   short:"肝経",   limb:"下肢", color:"var(--m-LR)", hex:"#a3e635" },
+};
+const MERIDIAN_ORDER = ["PC","TE","GB","LR"];
+
+// 五行カラー（要穴属性の手がかり）
+const PHASE_COLOR = { "木":"#34a853", "火":"#ea4f4f", "土":"#d6a03a", "金":"#8a93a3", "水":"#3b82f6" };
+const CAT_COLOR = {
+  "原穴":"#8b5cf6","絡穴":"#14b8a6","郄穴":"#f43f5e",
+  "八脈交会穴":"#6366f1","八会穴":"#d97706","下合穴":"#0891b2"
+};
+const attrColor = a => a.phase ? PHASE_COLOR[a.phase] : (CAT_COLOR[a.category] || "#9b988e");
+
+// Mode B のカテゴリ表示順
+const CATEGORY_ORDER = ["井穴","滎穴","兪穴","経穴","合穴","原穴","絡穴","郄穴","八脈交会穴","八会穴","下合穴"];
+
+const CARDS = [
+  // ── 手の厥陰心包経（上肢）
+  { id:"PC3",  meridian:"PC", code:"PC3",  pointName:"曲沢",   pointReading:"きょくたく",   limbGroup:"上肢", keyAttributes:[{label:"合水穴",category:"合穴",phase:"水"}] },
+  { id:"PC4",  meridian:"PC", code:"PC4",  pointName:"郄門",   pointReading:"げきもん",     limbGroup:"上肢", keyAttributes:[{label:"郄穴",category:"郄穴"}] },
+  { id:"PC5",  meridian:"PC", code:"PC5",  pointName:"間使",   pointReading:"かんし",       limbGroup:"上肢", keyAttributes:[{label:"経金穴",category:"経穴",phase:"金"}] },
+  { id:"PC6",  meridian:"PC", code:"PC6",  pointName:"内関",   pointReading:"ないかん",     limbGroup:"上肢", keyAttributes:[{label:"絡穴",category:"絡穴"},{label:"八脈交会穴（陰維脈）",category:"八脈交会穴",vessel:"陰維脈"}] },
+  { id:"PC7",  meridian:"PC", code:"PC7",  pointName:"大陵",   pointReading:"だいりょう",   limbGroup:"上肢", keyAttributes:[{label:"兪土穴",category:"兪穴",phase:"土"},{label:"原穴",category:"原穴"}] },
+  { id:"PC8",  meridian:"PC", code:"PC8",  pointName:"労宮",   pointReading:"ろうきゅう",   limbGroup:"上肢", keyAttributes:[{label:"滎火穴",category:"滎穴",phase:"火"}] },
+  { id:"PC9",  meridian:"PC", code:"PC9",  pointName:"中衝",   pointReading:"ちゅうしょう", limbGroup:"上肢", keyAttributes:[{label:"井木穴",category:"井穴",phase:"木"}] },
+  // ── 手の少陽三焦経（上肢）
+  { id:"TE1",  meridian:"TE", code:"TE1",  pointName:"関衝",   pointReading:"かんしょう",   limbGroup:"上肢", keyAttributes:[{label:"井金穴",category:"井穴",phase:"金"}] },
+  { id:"TE2",  meridian:"TE", code:"TE2",  pointName:"液門",   pointReading:"えきもん",     limbGroup:"上肢", keyAttributes:[{label:"滎水穴",category:"滎穴",phase:"水"}] },
+  { id:"TE3",  meridian:"TE", code:"TE3",  pointName:"中渚",   pointReading:"ちゅうしょ",   limbGroup:"上肢", keyAttributes:[{label:"兪木穴",category:"兪穴",phase:"木"}] },
+  { id:"TE4",  meridian:"TE", code:"TE4",  pointName:"陽池",   pointReading:"ようち",       limbGroup:"上肢", keyAttributes:[{label:"原穴",category:"原穴"}] },
+  { id:"TE5",  meridian:"TE", code:"TE5",  pointName:"外関",   pointReading:"がいかん",     limbGroup:"上肢", keyAttributes:[{label:"絡穴",category:"絡穴"},{label:"八脈交会穴（陽維脈）",category:"八脈交会穴",vessel:"陽維脈"}] },
+  { id:"TE6",  meridian:"TE", code:"TE6",  pointName:"支溝",   pointReading:"しこう",       limbGroup:"上肢", keyAttributes:[{label:"経火穴",category:"経穴",phase:"火"}] },
+  { id:"TE7",  meridian:"TE", code:"TE7",  pointName:"会宗",   pointReading:"えそう",       limbGroup:"上肢", keyAttributes:[{label:"郄穴",category:"郄穴"}] },
+  { id:"TE10", meridian:"TE", code:"TE10", pointName:"天井",   pointReading:"てんせい",     limbGroup:"上肢", keyAttributes:[{label:"合土穴",category:"合穴",phase:"土"}] },
+  // ── 足の少陽胆経（下肢）
+  { id:"GB34", meridian:"GB", code:"GB34", pointName:"陽陵泉", pointReading:"ようりょうせん", limbGroup:"下肢", keyAttributes:[{label:"合土穴",category:"合穴",phase:"土"},{label:"筋会",category:"八会穴"},{label:"胆の下合穴",category:"下合穴"}] },
+  { id:"GB36", meridian:"GB", code:"GB36", pointName:"外丘",   pointReading:"がいきゅう",   limbGroup:"下肢", keyAttributes:[{label:"郄穴",category:"郄穴"}] },
+  { id:"GB37", meridian:"GB", code:"GB37", pointName:"光明",   pointReading:"こうめい",     limbGroup:"下肢", keyAttributes:[{label:"絡穴",category:"絡穴"}] },
+  { id:"GB38", meridian:"GB", code:"GB38", pointName:"陽輔",   pointReading:"ようほ",       limbGroup:"下肢", keyAttributes:[{label:"経火穴",category:"経穴",phase:"火"}] },
+  { id:"GB39", meridian:"GB", code:"GB39", pointName:"懸鐘",   pointReading:"けんしょう",   limbGroup:"下肢", keyAttributes:[{label:"髄会",category:"八会穴"}] },
+  { id:"GB40", meridian:"GB", code:"GB40", pointName:"丘墟",   pointReading:"きゅうきょ",   limbGroup:"下肢", keyAttributes:[{label:"原穴",category:"原穴"}] },
+  { id:"GB41", meridian:"GB", code:"GB41", pointName:"足臨泣", pointReading:"あしりんきゅう", limbGroup:"下肢", keyAttributes:[{label:"兪木穴",category:"兪穴",phase:"木"},{label:"八脈交会穴（帯脈）",category:"八脈交会穴",vessel:"帯脈"}] },
+  { id:"GB43", meridian:"GB", code:"GB43", pointName:"侠谿",   pointReading:"きょうけい",   limbGroup:"下肢", keyAttributes:[{label:"滎水穴",category:"滎穴",phase:"水"}] },
+  { id:"GB44", meridian:"GB", code:"GB44", pointName:"足竅陰", pointReading:"あしきょういん", limbGroup:"下肢", keyAttributes:[{label:"井金穴",category:"井穴",phase:"金"}] },
+  // ── 足の厥陰肝経（下肢）
+  { id:"LR1",  meridian:"LR", code:"LR1",  pointName:"大敦",   pointReading:"だいとん",     limbGroup:"下肢", keyAttributes:[{label:"井木穴",category:"井穴",phase:"木"}] },
+  { id:"LR2",  meridian:"LR", code:"LR2",  pointName:"行間",   pointReading:"こうかん",     limbGroup:"下肢", keyAttributes:[{label:"滎火穴",category:"滎穴",phase:"火"}] },
+  { id:"LR3",  meridian:"LR", code:"LR3",  pointName:"太衝",   pointReading:"たいしょう",   limbGroup:"下肢", keyAttributes:[{label:"兪土穴",category:"兪穴",phase:"土"},{label:"原穴",category:"原穴"}] },
+  { id:"LR4",  meridian:"LR", code:"LR4",  pointName:"中封",   pointReading:"ちゅうほう",   limbGroup:"下肢", keyAttributes:[{label:"経金穴",category:"経穴",phase:"金"}] },
+  { id:"LR5",  meridian:"LR", code:"LR5",  pointName:"蠡溝",   pointReading:"れいこう",     limbGroup:"下肢", keyAttributes:[{label:"絡穴",category:"絡穴"}] },
+  { id:"LR6",  meridian:"LR", code:"LR6",  pointName:"中都",   pointReading:"ちゅうと",     limbGroup:"下肢", keyAttributes:[{label:"郄穴",category:"郄穴"}] },
+  { id:"LR8",  meridian:"LR", code:"LR8",  pointName:"曲泉",   pointReading:"きょくせん",   limbGroup:"下肢", keyAttributes:[{label:"合水穴",category:"合穴",phase:"水"}] },
+];
+
+/* ============================================================
+   2. STATUS / STORAGE
+   ============================================================ */
+const STATUS_META = {
+  forgot:  { label:"忘れた",  color:"var(--s-forgot)",  hex:"#fb7185", key:"1" },
+  good:    { label:"覚えた",  color:"var(--s-good)",    hex:"#56b8f0", key:"2" },
+  perfect: { label:"完璧",    color:"var(--s-perfect)", hex:"#e9c46a", key:"3" },
+};
+const NEW_HEX = "#3a3f47";
+const STORE_KEY = "yoketsu_flash_v1";
+const SET_KEY = "yoketsu_settings_v1";
+const todayKey = () => { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
+const daysBetween = (a,b)=>Math.round((new Date(b)-new Date(a))/86400000);
+
+function loadProgress(){
+  try{ const r=JSON.parse(localStorage.getItem(STORE_KEY)); if(r&&r.cards) return r; }catch(e){}
+  return { cards:{}, stats:{ todayDate:"", todayCount:0, streak:0, lastStudyDate:"", totalReviews:0 } };
+}
+function loadSettings(){
+  try{ const r=JSON.parse(localStorage.getItem(SET_KEY)); if(r&&r.meridians) return r; }catch(e){}
+  return { mode:"A", order:"sequential", meridians:[...MERIDIAN_ORDER] };
+}
+const statusOf = (prog,id)=> (prog.cards[id] && prog.cards[id].status) || "new";
+
+function applyStatus(prog, ids, status){
+  const cards={...prog.cards}; const now=Date.now(); const today=todayKey();
+  ids.forEach(id=>{
+    const p = cards[id] || { status:"new", forgotCount:0, reviewCount:0, lastReviewedAt:null };
+    cards[id] = { ...p, status, lastReviewedAt:now, reviewCount:p.reviewCount+1, forgotCount:p.forgotCount + (status==="forgot"?1:0) };
+  });
+  let s={...prog.stats};
+  if(s.todayDate!==today){ s.todayDate=today; s.todayCount=0; }
+  s.todayCount += ids.length;
+  s.totalReviews = (s.totalReviews||0)+ids.length;
+  if(s.lastStudyDate!==today){
+    if(s.lastStudyDate && daysBetween(s.lastStudyDate,today)===1) s.streak=(s.streak||0)+1;
+    else s.streak=1;
+    s.lastStudyDate=today;
+  }
+  return { cards, stats:s };
+}
+
+/* ============================================================
+   3. DECK BUILDING
+   ============================================================ */
+const shuffle = arr => { const a=[...arr]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const filterCards = mers => CARDS.filter(c=>mers.includes(c.meridian));
+
+function buildDeckA(mers, order){
+  const d = filterCards(mers).map(c=>({ type:"A", key:c.id, card:c }));
+  return order==="random" ? shuffle(d) : d;
+}
+function buildDeckB(mers, order){
+  const cards = filterCards(mers);
+  const out=[];
+  for(const cat of CATEGORY_ORDER){
+    const pts=[];
+    for(const c of cards){
+      const a = c.keyAttributes.find(a=>a.category===cat);
+      if(!a) continue;
+      let sub=null;
+      if(a.phase) sub=a.label;            // 例: 兪木穴
+      else if(a.vessel) sub=a.vessel;      // 例: 陰維脈
+      else if(cat==="八会穴") sub=a.label; // 例: 筋会
+      pts.push({ id:c.id, code:c.code, pointName:c.pointName, reading:c.pointReading, meridian:c.meridian, sub });
+    }
+    if(pts.length) out.push({ type:"B", key:cat, category:cat, points:pts });
+  }
+  return order==="random" ? shuffle(out) : out;
+}
+function buildReviewDeck(prog, order){
+  const ids = CARDS.filter(c=>statusOf(prog,c.id)==="forgot");
+  const d = ids.map(c=>({ type:"A", key:c.id, card:c }));
+  return order==="random" ? shuffle(d) : d;
+}
+
+/* ============================================================
+   4. SMALL UI PIECES
+   ============================================================ */
+function Ring({ size=84, stroke=10, segments }){
+  const r=(size-stroke)/2, c=2*Math.PI*r, total=segments.reduce((s,x)=>s+x.value,0)||1;
+  let off=0;
+  return (
+    <svg width={size} height={size} style={{transform:"rotate(-90deg)"}}>
+      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(255,255,255,.07)" strokeWidth={stroke}/>
+      {segments.filter(s=>s.value>0).map((s,i)=>{
+        const len=(s.value/total)*c, el=<circle key={i} cx={size/2} cy={size/2} r={r} fill="none" stroke={s.color} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${Math.max(len-2,0)} ${c}`} strokeDashoffset={-off}/>;
+        off+=len; return el;
+      })}
+    </svg>
+  );
+}
+const Ic = ({d,s=18,sw=2})=>(<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round"><path d={d}/></svg>);
+const ICON={ play:"M6 4l14 8-14 8z", refresh:"M3 12a9 9 0 1 1 3 6.7M3 19v-4h4", chart:"M4 20V10M10 20V4M16 20v-7M22 20H2", x:"M6 6l12 12M18 6L6 18",
+  back:"M15 18l-6-6 6-6", fwd:"M9 18l6-6-6-6", flip:"M4 7h13l-3-3M20 17H7l3 3", check:"M5 12l4 4 8-9", bolt:"M13 2L4 14h7l-1 8 9-12h-7z", target:"M12 2v3M12 19v3M2 12h3M19 12h3" };
+
+/* ============================================================
+   5. SCREENS
+   ============================================================ */
+function Logo(){
+  return (
+    <svg className="logo" viewBox="0 0 40 40" fill="none">
+      <circle cx="20" cy="20" r="18.5" stroke="#e9c46a" strokeWidth="1.2" opacity=".55"/>
+      <circle cx="20" cy="20" r="12.5" stroke="#7dd3c0" strokeWidth="1.2" opacity=".7"/>
+      <circle cx="20" cy="20" r="4.4" fill="#e9c46a"/>
+      <path d="M20 1.5v7M20 31.5v7M1.5 20h7M31.5 20h7" stroke="#7dd3c0" strokeWidth="1.2" strokeLinecap="round"/>
+    </svg>
+  );
+}
+
+function HomeScreen({ settings, setSettings, progress, onStart, onReview, onProgress }){
+  const set = patch => setSettings(s=>({ ...s, ...patch }));
+  const toggleMer = m => setSettings(s=>{
+    const has=s.meridians.includes(m);
+    const next = has ? s.meridians.filter(x=>x!==m) : [...s.meridians,m];
+    return { ...s, meridians: next.length?next:s.meridians };
+  });
+  const allOn = settings.meridians.length===MERIDIAN_ORDER.length;
+
+  const counts = useMemo(()=>{
+    const c={ new:0, forgot:0, good:0, perfect:0 };
+    CARDS.forEach(card=>c[statusOf(progress,card.id)]++);
+    return c;
+  },[progress]);
+  const total=CARDS.length;
+  const studied=total-counts.new;
+  const masteredPct=Math.round((counts.good+counts.perfect)/total*100);
+  const forgotCount=counts.forgot;
+  const selCount = filterCards(settings.meridians).length;
+
+  return (
+    <div className="fadein">
+      <div className="sec">
+        <p className="sec-label">学習モード</p>
+        <div className="seg">
+          <button className={settings.mode==="A"?"on":""} onClick={()=>set({mode:"A"})}>経穴 → 要穴<span className="s2">経穴名から属性を答える</span></button>
+          <button className={settings.mode==="B"?"on":""} onClick={()=>set({mode:"B"})}>要穴 → 経穴<span className="s2">属性から該当経穴を答える</span></button>
+        </div>
+      </div>
+
+      <div className="sec">
+        <p className="sec-label">経絡フィルター</p>
+        <div className="chips">
+          {MERIDIAN_ORDER.map(m=>{
+            const M=MERIDIANS[m], on=settings.meridians.includes(m), n=CARDS.filter(c=>c.meridian===m).length;
+            return (
+              <button key={m} className={"chip"+(on?" on":"")} style={{"--mc":M.color}} onClick={()=>toggleMer(m)}>
+                <span className="dot" style={{background:M.color}}/>
+                <span>
+                  <span className="nm">{M.short}</span>
+                  <span className="meta">{M.limb}・{n}穴</span>
+                </span>
+                <span className="check"><Ic d={ICON.check} s={11} sw={3}/></span>
+              </button>
+            );
+          })}
+          <button className="chip-all" onClick={()=>set({meridians:[...MERIDIAN_ORDER]})}>
+            <span>すべての経絡を対象にする</span>
+            <span style={{color: allOn?"var(--accent)":"inherit"}}>{allOn?"選択中 ✓":"全選択"}</span>
+          </button>
+        </div>
+      </div>
+
+      <div className="sec">
+        <p className="sec-label">出題順</p>
+        <div className="seg">
+          <button className={settings.order==="sequential"?"on":""} onClick={()=>set({order:"sequential"})}>順番どおり</button>
+          <button className={settings.order==="random"?"on":""} onClick={()=>set({order:"random"})}>ランダム</button>
+        </div>
+      </div>
+
+      <div className="sec">
+        <button className="cta" disabled={!selCount} onClick={onStart}>
+          <Ic d={ICON.play} s={17}/> 学習を始める（{settings.mode==="A"?selCount:"属性別"}{settings.mode==="A"?"枚":""}）
+        </button>
+        <button className="review-btn" disabled={!forgotCount} onClick={onReview}>
+          <span className="ico"><Ic d={ICON.refresh} s={18}/></span>
+          <span>
+            <div className="t1">忘れたカードを復習</div>
+            <div className="t2">弱点だけを効率よく回す</div>
+          </span>
+          <span className="num">{forgotCount}</span>
+        </button>
+      </div>
+
+      <div className="sec">
+        <p className="sec-label">学習状況</p>
+        <div className="summary">
+          <div className="ring-wrap">
+            <Ring size={94} stroke={11} segments={[
+              {value:counts.perfect,color:STATUS_META.perfect.hex},
+              {value:counts.good,color:STATUS_META.good.hex},
+              {value:counts.forgot,color:STATUS_META.forgot.hex},
+            ]}/>
+            <div className="ring-center"><b>{masteredPct}%</b><span>習得</span></div>
+          </div>
+          <div className="stats">
+            <div className="stat"><span className="sw" style={{background:NEW_HEX}}/><span>未学習</span><b>{counts.new}</b></div>
+            <div className="stat"><span className="sw" style={{background:STATUS_META.forgot.hex}}/><span>忘れた</span><b>{counts.forgot}</b></div>
+            <div className="stat"><span className="sw" style={{background:STATUS_META.good.hex}}/><span>覚えた</span><b>{counts.good}</b></div>
+            <div className="stat"><span className="sw" style={{background:STATUS_META.perfect.hex}}/><span>完璧</span><b>{counts.perfect}</b></div>
+          </div>
+        </div>
+        <div className="mini-row">
+          <div className="mini"><b>{studied}/{total}</b><span>学習済み</span></div>
+          <div className="mini"><b>{progress.stats.todayDate===todayKey()?progress.stats.todayCount:0}</b><span>今日の枚数</span></div>
+          <div className="mini"><b className="fire">{progress.stats.streak||0}<span style={{fontSize:13}}> 日</span></b><span>連続学習</span></div>
+        </div>
+        <button className="ghost-btn" style={{width:"100%",justifyContent:"center",marginTop:11}} onClick={onProgress}>
+          <Ic d={ICON.chart} s={16}/> 進捗をくわしく見る
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Flip Card ---------- */
+function FlipCard({ item, mode, flipped, onFlip }){
+  const isB = item.type==="B";
+  return (
+    <div className="stage">
+      <div className={"flip"+(flipped?" flipped":"")} onClick={onFlip}>
+        {/* FRONT */}
+        <div className="face front">
+          {!isB ? <FrontA card={item.card}/> : <FrontB item={item}/>}
+        </div>
+        {/* BACK */}
+        <div className="face back">
+          {!isB ? <BackA card={item.card}/> : <BackB item={item}/>}
+        </div>
+      </div>
+    </div>
+  );
+}
+function FrontA({card}){ const M=MERIDIANS[card.meridian];
+  return (<>
+    <div className="face-top">
+      <span className="m-pill" style={{background:M.color}}>{M.short}</span>
+      <span className="limb-pill">{card.limbGroup}</span>
+      <span className="code-pill">{card.code}</span>
+    </div>
+    <div className="face-mid">
+      <span className="watermark mincho">{card.pointName[0]}</span>
+      <div className="pt-name mincho">{card.pointName}</div>
+      <div className="pt-read">{card.pointReading}</div>
+    </div>
+    <div className="face-foot"><Ic d={ICON.flip} s={15}/> タップして要穴を確認</div>
+  </>);
+}
+function BackA({card}){ const M=MERIDIANS[card.meridian];
+  return (<>
+    <div className="face-top">
+      <span className="m-pill" style={{background:M.color}}>{M.short}</span>
+      <span className="code-pill">{card.code}</span>
+    </div>
+    <div className="face-mid">
+      <div className="back-name mincho">{card.pointName}（{card.pointReading}）</div>
+      <div className="attr-list">
+        {card.keyAttributes.map((a,i)=>(
+          <div className="attr" key={i} style={{"--ac":attrColor(a)}}>
+            <span className="ad"/>
+            <span className="al">{a.label}</span>
+            <span className="acat">{a.phase?`${a.phase}行`:a.category}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+    <div className="face-foot">下のボタンで習熟度を記録</div>
+  </>);
+}
+function FrontB({item}){
+  return (<>
+    <div className="face-top"><span className="m-pill" style={{background:"#4b5563"}}>要穴属性</span><span className="code-pill">{item.points.length}穴</span></div>
+    <div className="face-mid">
+      <span className="watermark mincho">{item.category[0]}</span>
+      <div className="cat-name mincho">{item.category}</div>
+      <div className="cat-hint">この属性をもつ経穴は？</div>
+      <div className="cat-count">該当 {item.points.length} 穴</div>
+    </div>
+    <div className="face-foot"><Ic d={ICON.flip} s={15}/> タップして経穴を確認</div>
+  </>);
+}
+function BackB({item}){
+  return (<>
+    <div className="face-top"><span className="m-pill" style={{background:"#4b5563"}}>{item.category}</span><span className="code-pill">{item.points.length}穴</span></div>
+    <div className="face-mid">
+      <div className="pts-grid">
+        {item.points.map((p,i)=>{ const M=MERIDIANS[p.meridian];
+          return (
+            <div className="ptrow" key={i}>
+              <span className="pd" style={{background:M.color}}/>
+              <span className="pn mincho">{p.pointName}</span>
+              <span className="pr">{p.reading}</span>
+              {p.sub && <span className="psub">{p.sub}</span>}
+              <span className="pc">{p.code}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+    <div className="face-foot">下のボタンでまとめて習熟度を記録</div>
+  </>);
+}
+
+/* ---------- Study Screen ---------- */
+function StudyScreen({ session, setSession, progress, gradeCurrent, onExit, onReplayForgot, onRestart, onHome }){
+  const { deck, index } = session;
+  const item = deck[index];
+  const done = index>=deck.length;
+  const flip = ()=> setSession(s=>({...s, flipped:!s.flipped}));
+  const go = dir => setSession(s=>{ const ni=Math.min(Math.max(s.index+dir,0),deck.length); return {...s, index:ni, flipped:false}; });
+
+  // keyboard
+  useEffect(()=>{
+    const h=e=>{
+      if(done) return;
+      if(e.code==="Space"||e.code==="Enter"){ e.preventDefault(); flip(); }
+      else if(e.code==="ArrowLeft") go(-1);
+      else if(e.code==="ArrowRight") go(1);
+      else if(e.key==="1") gradeCurrent("forgot");
+      else if(e.key==="2") gradeCurrent("good");
+      else if(e.key==="3") gradeCurrent("perfect");
+    };
+    window.addEventListener("keydown",h); return ()=>window.removeEventListener("keydown",h);
+  });
+
+  if(done){
+    return <DoneOverlay session={session} progress={progress} onReplayForgot={onReplayForgot} onRestart={onRestart} onHome={onHome}/>;
+  }
+
+  const curStatus = item.type==="A" ? statusOf(progress,item.card.id) : null;
+  const pct = Math.round((index/deck.length)*100);
+
+  return (
+    <div className="fadein">
+      <div className="study-top">
+        <button className="x-btn" onClick={onExit}><Ic d={ICON.x} s={16}/></button>
+        <div className="pbar"><i style={{width:`${pct}%`}}/></div>
+        <span className="counter">{index+1} / {deck.length}</span>
+      </div>
+
+      <FlipCard key={item.key} item={item} mode={session.mode} flipped={session.flipped} onFlip={flip}/>
+
+      <div className="nav-row">
+        <button className="nav-btn" disabled={index===0} onClick={()=>go(-1)}><Ic d={ICON.back} s={20}/></button>
+        <button className="flip-cue" onClick={flip}>
+          <Ic d={ICON.flip} s={16}/> {session.flipped?"問題に戻る":"答えを見る"}
+        </button>
+        <button className="nav-btn" onClick={()=>go(1)}><Ic d={ICON.fwd} s={20}/></button>
+      </div>
+
+      <div className="status-row">
+        {Object.entries(STATUS_META).map(([k,m])=>(
+          <button key={k} className={"sbtn"+(curStatus===k?" cur":"")}
+            style={{"--cc":m.color, "--bc":`color-mix(in srgb, ${m.hex} 40%, transparent)`, "--bgc":`color-mix(in srgb, ${m.hex} 12%, transparent)`}}
+            onClick={()=>gradeCurrent(k)}>
+            {m.label}<span className="k">{m.key}キー</span>
+          </button>
+        ))}
+      </div>
+      <p className="status-note">
+        {item.type==="B" ? "記録すると該当する経穴すべてに反映されます" : "記録すると自動で次のカードへ進みます"}
+        ・ Space＝めくる / ←→＝移動
+      </p>
+    </div>
+  );
+}
+
+function DoneOverlay({ session, progress, onReplayForgot, onRestart, onHome }){
+  const res=session.results||{};
+  const vals=Object.values(res);
+  const cnt={ forgot:0, good:0, perfect:0 };
+  vals.forEach(v=>cnt[v]++);
+  const forgotInSession = Object.entries(res).filter(([k,v])=>v==="forgot");
+  const confetti = useMemo(()=>Array.from({length:90}).map((_,i)=>{
+    const colors=["#e9c46a","#7dd3c0","#fb7185","#56b8f0","#a3e635"];
+    return { left:Math.random()*100, bg:colors[i%colors.length], dur:2.2+Math.random()*2.2, delay:Math.random()*1.2, rot:Math.random()*360 };
+  }),[]);
+  return (
+    <div className="overlay">
+      <div className="done fadein">
+        {confetti.map((c,i)=>(<span key={i} className="confetti" style={{left:`${c.left}%`,background:c.bg,animationDuration:`${c.dur}s`,animationDelay:`${c.delay}s`,transform:`rotate(${c.rot}deg)`}}/>))}
+        <div className="seal"><Ic d={ICON.check} s={36} sw={3}/></div>
+        <h2>セッション完了！</h2>
+        <p>{session.source==="review"?"弱点の復習":"このデッキ"}を{vals.length}枚やりきりました{progress.stats.streak>1?` ・ ${progress.stats.streak}日連続`:""}</p>
+        <div className="done-stats">
+          <div className="ds"><b style={{color:STATUS_META.forgot.hex}}>{cnt.forgot}</b><span>忘れた</span></div>
+          <div className="ds"><b style={{color:STATUS_META.good.hex}}>{cnt.good}</b><span>覚えた</span></div>
+          <div className="ds"><b style={{color:STATUS_META.perfect.hex}}>{cnt.perfect}</b><span>完璧</span></div>
+        </div>
+        {forgotInSession.length>0 &&
+          <button className="cta" onClick={()=>onReplayForgot(forgotInSession.map(([k])=>k))}>
+            <Ic d={ICON.refresh} s={16}/> 忘れたカードをもう一周（{forgotInSession.length}枚）
+          </button>}
+        <button className="ghost-btn" onClick={onRestart}><Ic d={ICON.refresh} s={15}/> 同じ条件でもう一度</button>
+        <button className="ghost-btn" onClick={onHome}>ホームへ戻る</button>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Progress Screen ---------- */
+function ProgressScreen({ progress, onReview, onReset, onHome }){
+  const counts = useMemo(()=>{ const c={new:0,forgot:0,good:0,perfect:0}; CARDS.forEach(card=>c[statusOf(progress,card.id)]++); return c; },[progress]);
+  const total=CARDS.length;
+  const masteredPct=Math.round((counts.good+counts.perfect)/total*100);
+
+  const perMer = MERIDIAN_ORDER.map(m=>{
+    const cs=CARDS.filter(c=>c.meridian===m); const c={new:0,forgot:0,good:0,perfect:0};
+    cs.forEach(card=>c[statusOf(progress,card.id)]++);
+    return { m, total:cs.length, c, pct:Math.round((c.good+c.perfect)/cs.length*100) };
+  });
+
+  const weak = useMemo(()=>CARDS.map(card=>({card, n:(progress.cards[card.id]&&progress.cards[card.id].forgotCount)||0}))
+    .filter(x=>x.n>0).sort((a,b)=>b.n-a.n).slice(0,5),[progress]);
+
+  return (
+    <div className="fadein">
+      <div className="prog-hero">
+        <div className="ring-wrap">
+          <Ring size={108} stroke={13} segments={[
+            {value:counts.perfect,color:STATUS_META.perfect.hex},
+            {value:counts.good,color:STATUS_META.good.hex},
+            {value:counts.forgot,color:STATUS_META.forgot.hex},
+          ]}/>
+          <div className="ring-center"><b>{masteredPct}%</b><span>習得率</span></div>
+        </div>
+        <div className="stats">
+          <div className="legend"><span className="sw" style={{background:NEW_HEX}}/><span>未学習</span><b>{counts.new}</b></div>
+          <div className="legend"><span className="sw" style={{background:STATUS_META.forgot.hex}}/><span>忘れた</span><b>{counts.forgot}</b></div>
+          <div className="legend"><span className="sw" style={{background:STATUS_META.good.hex}}/><span>覚えた</span><b>{counts.good}</b></div>
+          <div className="legend"><span className="sw" style={{background:STATUS_META.perfect.hex}}/><span>完璧</span><b>{counts.perfect}</b></div>
+        </div>
+      </div>
+
+      <div className="mini-row" style={{marginTop:13}}>
+        <div className="mini"><b>{total-counts.new}/{total}</b><span>学習済み</span></div>
+        <div className="mini"><b>{progress.stats.todayDate===todayKey()?progress.stats.todayCount:0}</b><span>今日の枚数</span></div>
+        <div className="mini"><b className="fire">{progress.stats.streak||0}<span style={{fontSize:13}}> 日</span></b><span>連続学習</span></div>
+      </div>
+
+      <div className="sec">
+        <p className="sec-label">経絡別の達成率</p>
+        {perMer.map(({m,total,c,pct})=>{ const M=MERIDIANS[m];
+          return (
+            <div className="mrow" key={m}>
+              <div className="h">
+                <span className="dot" style={{background:M.color}}/>
+                <span className="nm">{M.short}</span>
+                <span style={{fontSize:11,color:"var(--ink-faint)",marginLeft:6}}>{M.name}</span>
+                <span className="pct">{pct}%</span>
+              </div>
+              <div className="sbar">
+                <i style={{width:`${c.perfect/total*100}%`,background:STATUS_META.perfect.hex}}/>
+                <i style={{width:`${c.good/total*100}%`,background:STATUS_META.good.hex}}/>
+                <i style={{width:`${c.forgot/total*100}%`,background:STATUS_META.forgot.hex}}/>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="sec">
+        <p className="sec-label">苦手カードランキング</p>
+        {weak.length===0
+          ? <div className="mrow" style={{textAlign:"center",color:"var(--ink-dim)",fontSize:13,padding:"20px"}}>まだ「忘れた」の記録はありません</div>
+          : weak.map(({card,n},i)=>{ const M=MERIDIANS[card.meridian];
+            return (
+              <div className="weak-row" key={card.id}>
+                <span className="rk">{i+1}</span>
+                <span className="dot" style={{width:9,height:9,borderRadius:"50%",background:M.color}}/>
+                <span className="wn mincho">{card.pointName}</span>
+                <span className="wc">{card.code}・{M.short}</span>
+                <span className="wb">× {n}</span>
+              </div>
+            );
+          })}
+      </div>
+
+      <div className="sec">
+        <button className="review-btn" disabled={!counts.forgot} onClick={onReview}>
+          <span className="ico"><Ic d={ICON.refresh} s={18}/></span>
+          <span><div className="t1">忘れたカードを復習</div><div className="t2">{counts.forgot}枚の弱点を回す</div></span>
+          <span className="num">{counts.forgot}</span>
+        </button>
+        <button className="danger-btn" onClick={onReset}>すべての学習状態をリセット</button>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   6. APP ROOT
+   ============================================================ */
+function App(){
+  const [screen,setScreen]=useState("home"); // home | study | progress
+  const [settings,setSettings]=useState(loadSettings);
+  const [progress,setProgress]=useState(loadProgress);
+  const [session,setSession]=useState(null);
+
+  useEffect(()=>{ localStorage.setItem(STORE_KEY,JSON.stringify(progress)); },[progress]);
+  useEffect(()=>{ localStorage.setItem(SET_KEY,JSON.stringify(settings)); },[settings]);
+
+  const startSession=useCallback((source)=>{
+    let deck;
+    if(source==="review") deck=buildReviewDeck(progress,settings.order);
+    else deck = settings.mode==="A" ? buildDeckA(settings.meridians,settings.order) : buildDeckB(settings.meridians,settings.order);
+    if(!deck.length) return;
+    setSession({ deck, index:0, flipped:false, mode:source==="review"?"A":settings.mode, source, results:{} });
+    setScreen("study");
+  },[progress,settings]);
+
+  const gradeCurrent=useCallback((status)=>{
+    setSession(s=>{
+      if(!s) return s;
+      const item=s.deck[s.index];
+      const ids = item.type==="A" ? [item.card.id] : item.points.map(p=>p.id);
+      setProgress(p=>applyStatus(p,ids,status));
+      const results={...s.results, [item.key]:status};
+      return { ...s, results, index:s.index+1, flipped:false };
+    });
+  },[]);
+
+  const replayForgot=useCallback((ids)=>{
+    const deck = ids.map(id=>{
+      const card=CARDS.find(c=>c.id===id);
+      if(card) return { type:"A", key:card.id, card };
+      // mode B key (category) → rebuild as A cards of its points not trivial; fall back to A by id
+      return null;
+    }).filter(Boolean);
+    if(!deck.length){ setScreen("home"); setSession(null); return; }
+    setSession({ deck, index:0, flipped:false, mode:"A", source:"review", results:{} });
+  },[]);
+
+  const restart=useCallback(()=>{
+    setSession(s=>({ ...s, index:0, flipped:false, results:{}, deck: settings.order==="random"?shuffle(s.deck):s.deck }));
+  },[settings]);
+
+  const resetAll=useCallback(()=>{
+    if(window.confirm("すべての学習状態（覚えた・忘れた等）と連続日数をリセットします。よろしいですか？")){
+      setProgress({ cards:{}, stats:{ todayDate:"", todayCount:0, streak:0, lastStudyDate:"", totalReviews:0 } });
+    }
+  },[]);
+
+  const goHome=()=>{ setSession(null); setScreen("home"); };
+
+  return (
+    <div className="app">
+      <div className="topbar">
+        <div className="brand" onClick={goHome}>
+          <Logo/>
+          <div>
+            <h1 className="mincho">要穴 <span style={{color:"var(--gold)"}}>Flash</span></h1>
+            <div className="sub">経絡経穴 ・ 試験対策</div>
+          </div>
+        </div>
+        <div className="spacer"/>
+        {screen!=="home" && <button className="ghost-btn" onClick={goHome}>ホーム</button>}
+      </div>
+
+      {screen==="home" &&
+        <HomeScreen settings={settings} setSettings={setSettings} progress={progress}
+          onStart={()=>startSession("study")} onReview={()=>startSession("review")} onProgress={()=>setScreen("progress")}/>}
+
+      {screen==="study" && session &&
+        <StudyScreen session={session} setSession={setSession} progress={progress} gradeCurrent={gradeCurrent}
+          onExit={goHome} onReplayForgot={replayForgot} onRestart={restart} onHome={goHome}/>}
+
+      {screen==="progress" &&
+        <ProgressScreen progress={progress} onReview={()=>startSession("review")} onReset={resetAll} onHome={goHome}/>}
+
+      <div className="foot">31の要穴カード ・ 心包 / 三焦 / 胆 / 肝 経 ── 四肢末端</div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
