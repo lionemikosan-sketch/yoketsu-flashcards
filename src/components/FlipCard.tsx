@@ -46,14 +46,14 @@ function FrontA({ card }: { card: Card }) {
 
 function BackA({ card }: { card: Card }) {
   const M = MERIDIANS[card.meridian];
+  // 「経穴 → 要穴」の答え面。経穴名・経穴番号は表に出した問題なので裏には出さない。
   return (
     <>
       <div className="face-top">
         <span className="m-pill" style={{ background: M.color }}>{M.short}</span>
-        <span className="code-pill">{card.code}</span>
       </div>
       <div className="face-mid">
-        <div className="back-name mincho">{card.pointName}（{card.pointReading}）</div>
+        <div className="back-name">要穴</div>
         <div className="attr-list">
           {card.keyAttributes.map((a, i) => (
             <div className="attr" key={i} style={{ ['--ac' as string]: attrColor(a) }}>
